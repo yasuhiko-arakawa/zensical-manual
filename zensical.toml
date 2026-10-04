@@ -1,18 +1,34 @@
 [project]
 site_url = "https://yasuhiko-arakawa.github.io/zensical-manual/"
-site_name = "Documentation"
+site_name = "Zensical マニュアル"
 # site_description = "Your project description"
 # site_author = "Your name"
 
-# copyright = "Copyright &copy; 2026 Your name"
+copyright = "Copyright &copy; 2026 Yasuhiko Arakawa"
 
 # repo_url = "https://github.com/user/repo"
 # repo_name = "user/repo"
 # edit_uri = "edit/main/docs/"
 
 nav = [
-  { "Get started" = "index.md" },
-  { "Markdown in 5min" = "markdown.md" },
+  { "ホーム" = "index.md" },
+  { "Zensical とは" = "about.md" },
+  { "セットアップ" = [
+    { "インストール" = "install.md" },
+    { "設定ファイル" = "config.md" },
+  ] },
+  { "執筆" = [
+    { "ページの書き方" = "authoring.md" },
+    { "画像とリンク" = "writing.md" },
+  ] },
+  { "公開と運用" = [
+    { "GitHub への公開" = "publish.md" },
+    { "更新と引き継ぎ" = "workflow.md" },
+  ] },
+  { "デフォルトのページ" = [
+    { "初期ページ" = "default-index.md" },
+    { "Markdown in 5min" = "markdown.md" },
+  ] },
 ]
 
 # extra_css = ["stylesheets/extra.css"]
@@ -62,21 +78,14 @@ features = [
 # code = "Jetbrains Mono"
 
 [[project.theme.palette]]
-media = "(prefers-color-scheme)"
-toggle.icon = "lucide/sun-moon"
-toggle.name = "Switch to light mode"
-
-[[project.theme.palette]]
-media = "(prefers-color-scheme: light)"
 scheme = "default"
 toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
-media = "(prefers-color-scheme: dark)"
 scheme = "slate"
 toggle.icon = "lucide/moon"
-toggle.name = "Switch to system preference"
+toggle.name = "Switch to light mode"
 
 # [[project.extra.social]]
 # icon = "fontawesome/brands/github"
