@@ -1,0 +1,8 @@
+# Zensical build output and cache
+site/
+.cache/
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
