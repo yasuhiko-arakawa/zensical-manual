@@ -4,7 +4,7 @@ site_name = "Zensical マニュアル"
 # site_description = "Your project description"
 # site_author = "Your name"
 
-copyright = "Copyright &copy; 2026 yasuhiko arakawa"
+copyright = "Copyright &copy; 2026 Yasuhiko Arakawa"
 
 # repo_url = "https://github.com/user/repo"
 # repo_name = "user/repo"
@@ -12,6 +12,7 @@ copyright = "Copyright &copy; 2026 yasuhiko arakawa"
 
 nav = [
   { "ホーム" = "index.md" },
+  { "Zensical とは" = "about.md" },
   { "インストール" = "install.md" },
   { "GitHub への公開" = "publish.md" },
   { "デフォルトのページ" = [

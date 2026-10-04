@@ -8,8 +8,9 @@ Zensical でドキュメントサイトを作成し、GitHub Pages で公開す�
 
 ## 目次
 
-1. [インストール](install.md): uv で Zensical を導入し、サイトを作成してプレビューする
-2. [GitHub への公開](publish.md): GitHub Pages で公開する
+1. [Zensical とは](about.md): Zensical の概要と特徴
+2. [インストール](install.md): uv で Zensical を導入し、サイトを作成してプレビューする
+3. [GitHub への公開](publish.md): GitHub Pages で公開する
 
 ## リファレンス
 
