@@ -12,6 +12,7 @@ copyright = "Copyright &copy; 2026 Yasuhiko Arakawa"
 
 nav = [
   { "ホーム" = "index.md" },
+  { "code例" = "syntax-sample.md" },
   { "Zensical とは" = "about.md" },
   { "セットアップ" = [
     { "インストール" = "install.md" },
@@ -31,7 +32,7 @@ nav = [
   ] },
 ]
 
-# extra_css = ["stylesheets/extra.css"]
+extra_css = ["stylesheets/extra.css"]
 # extra_javascript = ["javascripts/extra.js"]
 
 [project.theme]

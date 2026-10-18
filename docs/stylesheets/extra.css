@@ -1,0 +1,207 @@
+/*
+ * コードブロックのシンタックスハイライトを、VSCode のダークテーマ(Dark+)に近づける。
+ * ドキュメントがライトモードでも、コードブロックは常にダーク配色にする。
+ *
+ * このファイルだけで動く。ほかのドキュメントにコピーして使える。
+ * 対象: Zensical / Material for MkDocs 系のテーマ(--md-* の CSS 変数と、
+ *       [data-md-color-scheme] によるライト/ダークの切り替えを使う)。
+ * 確認用のサンプルは、syntax-sample.md にある。
+ *
+ * ---- 構成 ----
+ *   1. パレット(Dark+)
+ *   2. コードブロックの背景と文字色
+ *   3. 型・プリプロセッサ・CMake の調整
+ *   4. console(ターミナル)のコードブロック
+ *
+ * ---- 使い方 ----
+ * zensical.toml に追加する。
+ *     extra_css = ["stylesheets/extra.css"]
+ *
+ * ---- 前提 ----
+ * 言語名のクラス(.language-cmake など)には、
+ * pymdownx.highlight.pygments_lang_class = true が必要。
+ *
+ * ---- 制限 ----
+ * ハイライトは Pygments が行うため、Pygments が分けたトークン単位でしか色を付けられない。
+ * (例: C++ の関数名は区別されず、CMake の引数は文字列として扱われる)
+ *
+ * ---- ライトモードの配色を使いたい場合 ----
+ * 1 のパレットを [data-md-color-scheme="slate"] に移し、
+ * [data-md-color-scheme="default"] に次の値(VSCode Light+)を書く。
+ *   --vs-keyword: #0000ff;  --vs-type: #267f99;    --vs-preproc: #af00db;
+ *   --vs-string: #a31515;   --vs-escape: #ee0000;  --vs-number: #098658;
+ *   --vs-comment: #008000;  --vs-function: #795e26; --vs-variable: #001080;
+ * 背景と文字色は、#ffffff と #333333。
+ */
+
+/* =====================================================================
+ * 1. パレット (Dark+)
+ * ===================================================================== */
+:root {
+  /* コードブロック */
+  --code-bg: #1e1e1e;
+  --code-fg: #d4d4d4;
+  --code-border: #3c3c3c;
+  --code-dim: #858585;
+
+  /* コードのトークン */
+  --vs-keyword: #569cd6;
+  --vs-type: #4ec9b0;
+  --vs-preproc: #c586c0;
+  --vs-string: #ce9178;
+  --vs-escape: #d7ba7d;
+  --vs-number: #b5cea8;
+  --vs-comment: #6a9955;
+  --vs-variable: #9cdcfe;
+  --vs-function: #dcdcaa;
+
+  /* console(VSCode のターミナルの色) */
+  --term-fg: #cccccc;
+  --term-bright-green: #23d18b;
+}
+
+/* =====================================================================
+ * 2. コードブロックの背景と文字色
+ *
+ * ライトモードでも、ダークの配色にする。コピーボタンや行番号などの色も、
+ * 背景に合わせて上書きする。
+ * ===================================================================== */
+[data-md-color-scheme] .highlight {
+  --md-code-bg-color: var(--code-bg);
+  --md-code-fg-color: var(--code-fg);
+  --md-default-fg-color--light: var(--code-dim);
+  --md-default-fg-color--lighter: var(--code-border);
+  --md-default-fg-color--lightest: var(--code-dim);
+
+  /*
+   * Material のハイライト用の変数を、すべて Dark+ の色に上書きする。
+   * ライトモードの元の色は、ダークの背景では読みにくいため。
+   * また、一部の変数は、:root で `var(--md-code-fg-color)` などを参照した状態で
+   * 値が確定するため、上の上書きに追従しない。
+   *
+   * Material は、トークンごとに、この変数の色を割り当てている。
+   * そのため、ここで上書きすれば、個別のルールは不要になる。
+   *   keyword      k kd kn kp kr(kt は 3 で型の色にする)、nd ni nl nt
+   *   string       s s1 s2 sb sc si ss l、cpf(#include の <...>)
+   *   number       m mb mf mh mi mo il
+   *   special      se sh sr sx(cp は 3 でプリプロセッサの色にする)
+   *   function     nc ne nf nn(nc と nn は 3 で型の色にする)
+   *   constant     nb bp no
+   *   variable     na nv vc vg vi
+   *   comment      c c1 ch cm cs sd
+   *   operator     o ow
+   *   punctuation  p
+   *   name         n kc
+   *   generic      gh gu go gp ge gs gt gr
+   */
+  --md-code-hl-keyword-color: var(--vs-keyword);
+  --md-code-hl-string-color: var(--vs-string);
+  --md-code-hl-number-color: var(--vs-number);
+  --md-code-hl-special-color: var(--vs-escape);
+  --md-code-hl-function-color: var(--vs-function);
+  --md-code-hl-constant-color: var(--vs-function);
+  --md-code-hl-variable-color: var(--vs-variable);
+  --md-code-hl-comment-color: var(--vs-comment);
+  --md-code-hl-operator-color: var(--code-fg);
+  --md-code-hl-punctuation-color: var(--code-fg);
+  --md-code-hl-name-color: var(--code-fg);
+  --md-code-hl-generic-color: var(--code-dim);
+}
+
+/*
+ * 枠線は、外側の .highlight ではなく、コード本体に付ける。
+ * .highlight に付けると、内側の pre の上下の余白が枠の内側に入ってしまう。
+ */
+[data-md-color-scheme] .highlight pre > code {
+  border: 1px solid var(--code-border);
+}
+
+/* =====================================================================
+ * 3. 型・プリプロセッサ・CMake の調整
+ *
+ * 2 の変数の上書きだけでは足りない部分を、言語ごとに、トークンのクラスに直接指定する。
+ *   C++:   kt 型名(int など)   nc クラス名   nn 名前空間   cp プリプロセッサ(#include)
+ *   CMake: nb コマンド名   o ${ と }   s 引用符のない引数
+ * 他の言語は、2 の変数の上書きで決まった色になる。
+ * ===================================================================== */
+
+/* ---------- C++ ---------- */
+
+/* 型名、クラス名、名前空間 */
+[data-md-color-scheme] .highlight.language-cpp .kt,
+[data-md-color-scheme] .highlight.language-cpp .nc,
+[data-md-color-scheme] .highlight.language-cpp .nn {
+  color: var(--vs-type);
+}
+
+/* プリプロセッサ(#include, #define) */
+[data-md-color-scheme] .highlight.language-cpp .cp {
+  color: var(--vs-preproc);
+}
+
+/* ---------- CMake ---------- */
+
+/* コマンド名(project, set, add_executable, if など)はキーワードと同じ青系 */
+[data-md-color-scheme] .highlight.language-cmake .nb {
+  color: var(--vs-keyword);
+}
+
+/* ${ と }(変数 ${NAME} の名前部分は、2 の変数 variable で同じ色になる) */
+[data-md-color-scheme] .highlight.language-cmake .o {
+  color: var(--vs-variable);
+}
+
+/*
+ * Pygments の CMake 用の字句解析は、引用符のない引数(VERSION, CXX, main.cpp など)も
+ * 文字列として扱う。これを文字色に戻す(引用符で囲んだ文字列 s2 は、2 の変数 string で文字列色になる)。
+ */
+[data-md-color-scheme] .highlight.language-cmake .s {
+  color: var(--md-code-fg-color);
+}
+
+/* =====================================================================
+ * 4. console(ターミナル)のコードブロック
+ *
+ * Ubuntu の bash を VSCode のターミナルで見たときの表示に近づける。
+ * ```console と ```shell-session のブロックに、クラスなしで自動的に適用される。
+ * (Pygments では、この 2 つは同じ字句解析。)
+ *
+ * ---- 色について ----
+ * 背景はコードブロックと同じ(#1e1e1e)で、文字色は VSCode のターミナルの値にする。
+ * Ubuntu の bash のターミナルは、入力したコマンドを色分けしない(PowerShell の
+ * PSReadLine のような機能がない)。そのため、プロンプト以外は、すべて通常の文字色にする。
+ *
+ * プロンプトは、Ubuntu の既定の `ubuntu@host:~/proj$` のように、
+ * ユーザー名とホスト名を緑、パスを青にしたいが、Pygments は 1 つのトークンとして扱うため、
+ * 全体を緑にする。
+ * ===================================================================== */
+
+/* ---------- 背景と文字色 ---------- */
+[data-md-color-scheme] .highlight.language-console,
+[data-md-color-scheme] .highlight.language-shell-session {
+  --md-code-fg-color: var(--term-fg);
+}
+
+/* ---------- トークンの色 ---------- */
+
+/* すべて通常の文字色にする(共通のトークン割り当てを、まとめて打ち消す) */
+[data-md-color-scheme] .highlight.language-console span,
+[data-md-color-scheme] .highlight.language-shell-session span {
+  color: var(--term-fg);
+}
+
+/* プロンプト($ や ubuntu@host:~$): 緑 */
+[data-md-color-scheme] .highlight.language-console .gp,
+[data-md-color-scheme] .highlight.language-shell-session .gp {
+  color: var(--term-bright-green);
+}
+
+/*
+ * コメント(`$ ls # コメント` や `$ # コメント` の `#` 以降): 緑
+ * 実際のターミナルは色分けしないが、手順の説明で目立つように、色を付ける。
+ * 行頭だけの `# ...` は、Pygments が root のプロンプトとして扱うため、この色にならない。
+ */
+[data-md-color-scheme] .highlight.language-console .c1,
+[data-md-color-scheme] .highlight.language-shell-session .c1 {
+  color: var(--vs-comment);
+}
